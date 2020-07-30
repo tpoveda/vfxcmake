@@ -368,7 +368,7 @@ find_path(MAYA_USER_DIR
 # Handles the QUIETLY and REQUIRED arguments and sets MAYA_FOUND to TRUE if
 # all passed variables are TRUE
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Maya DEFAULT_MSG
+find_package_handle_standard_args(Maya
     MAYA_LIBRARIES MAYA_EXECUTABLE MAYA_INCLUDE_DIRS
     MAYA_LIBRARY_DIRS MAYA_VERSION MAYA_PLUGIN_SUFFIX
     MAYA_USER_DIR)
