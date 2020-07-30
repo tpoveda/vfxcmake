@@ -175,11 +175,20 @@ foreach(version ${_maya_TEST_VERSIONS})
 endforeach(version)
 
 # search for maya executable within the MAYA_LOCATION and PATH env vars and test paths
-find_program(MAYA_EXECUTABLE maya
-    PATHS $ENV{MAYA_LOCATION} ${_maya_TEST_PATHS}
-    PATH_SUFFIXES bin
-    NO_SYSTEM_ENVIRONMENT_PATH
-    DOC "Maya's executable path")
+
+if(Maya_FIND_VERSION_EXACT)
+    find_program(MAYA_EXECUTABLE_${Maya_FIND_VERSION} maya
+        PATHS ${_maya_TEST_PATHS}
+        PATH_SUFFIXES bin
+        DOC "Maya's executable path")
+
+    set(MAYA_EXECUTABLE ${MAYA_EXECUTABLE_${Maya_FIND_VERSION}})
+else()
+    find_program(MAYA_EXECUTABLE maya
+        PATHS ${_maya_TEST_PATHS}
+        PATH_SUFFIXES bin
+        DOC "Maya's executable path")
+endif()
 
 if(MAYA_EXECUTABLE)
     # TODO: use GET_FILENAME_COMPONENT here
@@ -253,19 +262,39 @@ endif()
 
 message(STATUS "Maya location: ${MAYA_LOCATION}")
 
-find_path(MAYA_INCLUDE_DIRS maya/MFn.h
-    HINTS ${MAYA_LOCATION}
-    PATH_SUFFIXES
-        include               # linux and windows
-        ../../devkit/include  # osx
-    DOC "Maya's include path")
+if(Maya_FIND_VERSION_EXACT)
+    find_path(MAYA_INCLUDE_DIRS_${Maya_FIND_VERSION} maya/MFn.h
+        HINTS ${MAYA_LOCATION}
+        PATH_SUFFIXES
+            include               # linux and windows
+            ../../devkit/include  # osx
+        DOC "Maya's include path")
+    set(MAYA_INCLUDE_DIRS ${MAYA_INCLUDE_DIRS_${Maya_FIND_VERSION}})
+else()
+    find_path(MAYA_INCLUDE_DIRS maya/MFn.h
+        HINTS ${MAYA_LOCATION}
+        PATH_SUFFIXES
+            include               # linux and windows
+            ../../devkit/include  # osx
+        DOC "Maya's include path")
+endif()
 
-find_path(MAYA_LIBRARY_DIRS libOpenMaya.dylib libOpenMaya.so OpenMaya.lib
-    HINTS ${MAYA_LOCATION}
-    PATH_SUFFIXES
-        lib    # linux and windows
-        MacOS  # osx
-    DOC "Maya's library path")
+if(Maya_FIND_VERSION_EXACT)
+    find_path(MAYA_LIBRARY_DIRS_${Maya_FIND_VERSION} libOpenMaya.dylib libOpenMaya.so OpenMaya.lib
+        HINTS ${MAYA_LOCATION}
+        PATH_SUFFIXES
+            lib    # linux and windows
+            MacOS  # osx
+        DOC "Maya's library path")
+    set(MAYA_LIBRARY_DIRS ${MAYA_LIBRARY_DIRS_${Maya_FIND_VERSION}})
+else()
+    find_path(MAYA_LIBRARY_DIRS libOpenMaya.dylib libOpenMaya.so OpenMaya.lib
+        HINTS ${MAYA_LOCATION}
+        PATH_SUFFIXES
+            lib    # linux and windows
+            MacOS  # osx
+        DOC "Maya's library path")
+endif()
 
 # Set deprecated variables to avoid compatibility breaks
 set(MAYA_INCLUDE_DIR ${MAYA_INCLUDE_DIRS})
