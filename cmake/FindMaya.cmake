@@ -300,7 +300,6 @@ endif()
 set(MAYA_INCLUDE_DIR ${MAYA_INCLUDE_DIRS})
 set(MAYA_LIBRARY_DIR ${MAYA_LIBRARY_DIRS})
 
-
 foreach(_maya_lib
     OpenMaya
     OpenMayaAnim
@@ -315,24 +314,47 @@ foreach(_maya_lib
 #   cgGL
     # HINTS is searched before PATHS, so preference is given to MAYA_LOCATION
     # (set via MAYA_EXECUTABLE)
-    if(APPLE)
-        find_library(MAYA_${_maya_lib}_LIBRARY ${_maya_lib}
-            HINTS ${MAYA_LOCATION}
-            PATHS ${_maya_TEST_PATHS}
-            PATH_SUFFIXES MacOS
-            # This must be used or else Foundation.framework will be found instead of libFoundation
-            NO_CMAKE_SYSTEM_PATH
-            DOC "Maya's ${MAYA_LIB} library path")
+
+    if(Maya_FIND_VERSION_EXACT)
+        if(APPLE)
+            find_library(MAYA_${_maya_lib}_LIBRARY_${Maya_FIND_VERSION} ${_maya_lib}
+                HINTS ${MAYA_LOCATION}
+                PATHS ${_maya_TEST_PATHS}
+                PATH_SUFFIXES MacOS
+                # This must be used or else Foundation.framework will be found instead of libFoundation
+                NO_CMAKE_SYSTEM_PATH
+                DOC "Maya's ${MAYA_LIB} library path")
+        else()
+            find_library(MAYA_${_maya_lib}_LIBRARY_${Maya_FIND_VERSION} ${_maya_lib}
+                HINTS ${MAYA_LOCATION}
+                PATHS ${_maya_TEST_PATHS}
+                PATH_SUFFIXES lib # linux and windows
+                DOC "Maya's ${MAYA_LIB} library path")
+        endif()
+        list(APPEND MAYA_LIBRARIES_${Maya_FIND_VERSION} ${MAYA_${_maya_lib}_LIBRARY_${Maya_FIND_VERSION}})
     else()
-        find_library(MAYA_${_maya_lib}_LIBRARY ${_maya_lib}
-            HINTS ${MAYA_LOCATION}
-            PATHS ${_maya_TEST_PATHS}
-            PATH_SUFFIXES lib # linux and windows
-            DOC "Maya's ${MAYA_LIB} library path")
+        if(APPLE)
+            find_library(MAYA_${_maya_lib}_LIBRARY ${_maya_lib}
+                HINTS ${MAYA_LOCATION}
+                PATHS ${_maya_TEST_PATHS}
+                PATH_SUFFIXES MacOS
+                # This must be used or else Foundation.framework will be found instead of libFoundation
+                NO_CMAKE_SYSTEM_PATH
+                DOC "Maya's ${MAYA_LIB} library path")
+        else()
+            find_library(MAYA_${_maya_lib}_LIBRARY ${_maya_lib}
+                HINTS ${MAYA_LOCATION}
+                PATHS ${_maya_TEST_PATHS}
+                PATH_SUFFIXES lib # linux and windows
+                DOC "Maya's ${MAYA_LIB} library path")
+        endif()
+        list(APPEND MAYA_LIBRARIES ${MAYA_${_maya_lib}_LIBRARY})
     endif()
-    list(APPEND MAYA_LIBRARIES ${MAYA_${_maya_lib}_LIBRARY})
 endforeach()
 
+if(Maya_FIND_VERSION_EXACT)
+    set(MAYA_LIBRARIES ${MAYA_LIBRARIES_${Maya_FIND_VERSION}})
+endif()
 
 find_path(MAYA_USER_DIR
     NAMES ${MAYA_VERSION}-x64 ${MAYA_VERSION}
