@@ -308,7 +308,7 @@ foreach(_maya_lib
     OpenMayaUI
     Image
     Foundation
-    IMFbase
+#    IMFbase  # not available in Maya 2020
     tbb)
 #   cg
 #   cgGL
